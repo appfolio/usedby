@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'organization_gem_dependencies'
+exit OrganizationGemDependencies::Cli.new.run

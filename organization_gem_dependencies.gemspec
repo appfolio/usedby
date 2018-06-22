@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
     organization..
   DESCRIPTION
   s.email = 'bryce.boe@appfolio.com'
-  s.executables = %(worganization_gem_dependencies)
+  s.executables = %(organization_gem_dependencies)
   s.files = Dir.glob('{bin,lib}/**/*') + %w[CHANGES.md LICENSE.txt README.md]
   s.homepage = 'https://github.com/appfolio/organization_gem_dependencies'
   s.license = 'BSD-2-Clause'
