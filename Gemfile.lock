@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    organization_gem_dependencies (0.1.0)
+    organization_gem_dependencies (0.2.0)
       octokit (~> 4.0)
 
 GEM
