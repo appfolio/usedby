@@ -10,17 +10,25 @@ require 'octokit'
 module OrganizationGemDependencies
   # Define the command line interface.
   class Cli
-    SEARCH_TERM = 'org:appfolio filename:Gemfile.lock'
+    SEARCH_TERM = 'org:%s filename:Gemfile.lock'
+    USAGE = <<~USAGE
+      Usage: organization_gem_dependencies [options] GITHUB_ORGANIZATION
+    USAGE
 
     def run
       parse_options
+      if ARGV.size != 1
+        STDERR.puts USAGE
+        return 1
+      end
+      github_organization = ARGV[0]
 
       access_token = ENV['GITHUB_ACCESS_TOKEN'] || \
                      STDIN.getpass('GitHub Personal Access Token: ')
       github = Octokit::Client.new(access_token: access_token)
 
       gems = {}
-      gemfiles(github) do |gemfile|
+      gemfiles(github, github_organization) do |gemfile|
         STDERR.puts "Processing #{gemfile.repository.name}/#{gemfile.path}"
         content = nil
         sleep_time = 0
@@ -45,8 +53,8 @@ module OrganizationGemDependencies
 
     private
 
-    def gemfiles(github)
-      github.search_code(SEARCH_TERM, per_page: 1000)
+    def gemfiles(github, organization)
+      github.search_code(SEARCH_TERM % organization, per_page: 1000)
       last_response = github.last_response
 
       matches = last_response.data.items
@@ -91,9 +99,7 @@ module OrganizationGemDependencies
     def parse_options
       @options = { direct: false }
       OptionParser.new do |config|
-        config.banner = <<~USAGE
-          Usage: organization_gem_dependencies [options]
-        USAGE
+        config.banner = USAGE
         config.on('-d', '--direct',
                   'Consider only direct dependencies.') do |direct|
           @options[:direct] = direct
