@@ -5,6 +5,6 @@ require 'organization_gem_dependencies'
 
 class VersionTest < MiniTest::Test
   def test_version
-    assert_equal '0.1.0', OrganizationGemDependencies::VERSION
+    assert_equal '0.2.0', OrganizationGemDependencies::VERSION
   end
 end
