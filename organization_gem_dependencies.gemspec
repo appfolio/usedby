@@ -15,7 +15,7 @@ Gem::Specification.new do |s|
   s.homepage = 'https://github.com/appfolio/organization_gem_dependencies'
   s.license = 'BSD-2-Clause'
   s.name = 'organization_gem_dependencies'
-  s.summary = 'Discover all ruby gem depedencies for a github organization.'
+  s.summary = 'Discover all ruby gem dependencies for a github organization.'
   s.version = OrganizationGemDependencies::VERSION
 
   s.add_development_dependency 'minitest', '~> 5.0'
