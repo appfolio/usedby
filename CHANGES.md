@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.3.0 (2018/07/20)
+
+**Added**
+
+* Don't include archived repositories.
+
+
 ## 0.2.0 (2018/07/03)
 
 **Added**
