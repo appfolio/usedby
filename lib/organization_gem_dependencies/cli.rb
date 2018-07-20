@@ -53,14 +53,37 @@ module OrganizationGemDependencies
 
     private
 
+    def archived_repositories(github, organization)
+      github.organization_repositories(organization)
+      last_response = github.last_response
+
+      repositories = []
+      last_response.data.each do |repository|
+        repositories << repository.name if repository.archived
+      end
+      until last_response.rels[:next].nil?
+        last_response = last_response.rels[:next].get
+        last_response.data.each do |repository|
+          repositories << repository.name if repository.archived
+        end
+      end
+      repositories
+    end
+
     def gemfiles(github, organization)
+      archived = archived_repositories(github, organization)
       github.search_code(SEARCH_TERM % organization, per_page: 1000)
       last_response = github.last_response
 
-      matches = last_response.data.items
+      matches = []
+      last_response.data.items.each do |match|
+        matches << match unless archived.include? match.repository.name
+      end
       until last_response.rels[:next].nil?
         last_response = last_response.rels[:next].get
-        matches.concat last_response.data.items
+        last_response.data.items.each do |match|
+          matches << match unless archived.include? match.repository.name
+        end
       end
 
       matches.sort_by(&:html_url).each do |match|
