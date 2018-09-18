@@ -29,7 +29,12 @@ module OrganizationGemDependencies
 
       gems = {}
       gemfiles(github, github_organization) do |gemfile|
-        STDERR.puts "Processing #{gemfile.repository.name}/#{gemfile.path}"
+        gemfile_path = "#{gemfile.repository.name}/#{gemfile.path}"
+        if filtered?(gemfile_path)
+          STDERR.puts "Skipping #{gemfile_path}"
+          next
+        end
+        STDERR.puts "Processing #{gemfile_path}"
         content = nil
         sleep_time = 0
         while content.nil?
@@ -68,6 +73,23 @@ module OrganizationGemDependencies
         end
       end
       repositories
+    end
+
+    def build_ignore_paths(ignored_paths, file)
+      File.open(file).each do |line|
+        cleaned = line.strip
+        ignored_paths << cleaned if cleaned != ''
+      end
+    rescue Errno::ENOENT, Errno::EISDIR
+      STDERR.puts "No such file #{file}"
+      exit 1
+    end
+
+    def filtered?(gemfile_path)
+      @options[:ignore_paths].each do |ignore_path|
+        return true if gemfile_path.start_with?(ignore_path)
+      end
+      false
     end
 
     def gemfiles(github, organization)
@@ -120,12 +142,17 @@ module OrganizationGemDependencies
     end
 
     def parse_options
-      @options = { direct: false }
+      @options = { direct: false, ignore_paths: [] }
       OptionParser.new do |config|
         config.banner = USAGE
         config.on('-d', '--direct',
                   'Consider only direct dependencies.') do |direct|
           @options[:direct] = direct
+        end
+        config.on('--ignore-file [FILEPATH]',
+                  'Ignore projects included in file.') do |ignore_file|
+
+          build_ignore_paths(@options[:ignore_paths], ignore_file)
         end
         config.version = OrganizationGemDependencies::VERSION
       end.parse!
