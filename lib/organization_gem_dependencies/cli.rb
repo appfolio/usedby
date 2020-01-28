@@ -154,6 +154,11 @@ module OrganizationGemDependencies
 
           build_ignore_paths(@options[:ignore_paths], ignore_file)
         end
+        config.on('--gems [GEM1,GEM2,GEM3]',
+                  'Consider only given gems.') do |gems|
+
+          @options[:gems] = gems.split(',')
+        end
         config.version = OrganizationGemDependencies::VERSION
       end.parse!
     end
@@ -164,6 +169,7 @@ module OrganizationGemDependencies
 
       gemfile.specs.each do |spec|
         next if @options[:direct] && !dependencies.include?(spec.name)
+        next if @options[:gems] && !@options[:gems].include?(spec.name)
         gems[spec.name] = {}
         gems[spec.name][spec.version] = [project]
       end
