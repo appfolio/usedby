@@ -10,10 +10,14 @@ require 'octokit'
 module OrganizationGemDependencies
   # Define the command line interface.
   class Cli
+    using VersionRangesIntersection
+
     SEARCH_TERM = 'org:%s filename:Gemfile.lock'
     USAGE = <<~USAGE
       Usage: organization_gem_dependencies [options] GITHUB_ORGANIZATION
     USAGE
+
+    GEMSPEC_SEARCH_TERM = 'org:%s extension:gemspec'
 
     def run
       parse_options
@@ -35,7 +39,6 @@ module OrganizationGemDependencies
           next
         end
         STDERR.puts "Processing #{gemfile_path}"
-        content = nil
         sleep_time = 0
         begin
           content = Base64.decode64(github.get(gemfile.url).content)
@@ -50,6 +53,29 @@ module OrganizationGemDependencies
           "#{gemfile.repository.name}/#{gemfile.path}"
         ))
       end
+
+      gemfiles(github, github_organization, GEMSPEC_SEARCH_TERM) do |gemspec|
+        gemspec_path = "#{gemspec.repository.name}/#{gemspec.path}"
+        if filtered?(gemspec_path)
+          STDERR.puts "Skipping #{gemspec_path}"
+          next
+        end
+        STDERR.puts "Processing #{gemspec_path}"
+        content = nil
+        sleep_time = 0
+        begin
+          content = Base64.decode64(github.get(gemspec.url).content)
+        rescue StandardError
+          sleep_time += 1
+          STDERR.puts "Sleeping #{sleep_time} seconds"
+          sleep(sleep_time)
+          retry
+        end
+        merge!(gems, process_gemspec(content,
+                                     "#{gemspec.repository.name}/#{gemspec.path}"
+        ))
+      end
+
       output gems
 
       0
@@ -99,9 +125,9 @@ module OrganizationGemDependencies
       false
     end
 
-    def gemfiles(github, organization)
+    def gemfiles(github, organization, search_term = SEARCH_TERM)
       archived = archived_repositories(github, organization)
-      github.search_code(SEARCH_TERM % organization, per_page: 1000)
+      github.search_code(search_term % organization, per_page: 1000)
       last_response = github.last_response
 
       matches = []
@@ -150,7 +176,7 @@ module OrganizationGemDependencies
       gems.sort.each do |gem, versions|
         sorted_gems[gem] = {}
         versions.sort.each do |version, projects|
-          sorted_gems[gem][version] = projects.sort
+          sorted_gems[gem][version_ranges_to_s(version)] = projects.sort
         end
       end
       puts JSON.pretty_generate(sorted_gems)
@@ -189,10 +215,73 @@ module OrganizationGemDependencies
       gemfile.specs.each do |spec|
         next if @options[:direct] && !dependencies.include?(spec.name)
         next if @options[:gems] && !@options[:gems].include?(spec.name)
+        spec_version_ranges = Bundler::VersionRanges.for(Gem::Requirement.new(spec.version))
         gems[spec.name] = {}
-        gems[spec.name][spec.version] = [project]
+        gems[spec.name][spec_version_ranges] = [project]
       end
       gems
+    end
+
+    # Process dependencies in gemspec according to:
+    # https://guides.rubygems.org/specification-reference/
+    # Sample supported formats:
+    #      s.add_dependency(%q<rspec>.freeze, ["~> 3.2"])
+    #   spec.add_runtime_dependency "multi_json", "~>1.12", ">=1.12.0"
+    # Sample unsupported formats:
+    #      s.add_development_dependency "rake", "~> 10.5" if on_less_than_1_9_3?
+    #      s.add_dependency 'sunspot', Sunspot::VERSION
+    def process_gemspec(content, project)
+      gems = {}
+      dummy_spec = Gem::Specification.new
+      content.each_line do |line|
+        if line =~ /^\s*(\w+)\.add_(development_dependency|runtime_dependency|dependency)\b/
+          spec_name = $1
+          begin
+            eval line.sub(spec_name, 'dummy_spec')
+          rescue => e
+            $stderr.puts e
+            next
+          end
+          dep = dummy_spec.dependencies.last
+          gem_name = dep.name
+          next if @options[:gems] && !@options[:gems].include?(gem_name)
+          gem_version_ranges = Bundler::VersionRanges.for(dep.requirement)
+          gems[gem_name] = {}
+          gems[gem_name][gem_version_ranges] = [project]
+        end
+      end
+      gems
+    end
+
+    # Uses mathematical notation for ranges
+    # The unbounded range is [0, ∞)
+    def version_ranges_to_s(gem_version_ranges)
+      if !gem_version_ranges.kind_of?(Array) || gem_version_ranges.size != 2
+        $stderr.puts "Unknown format for version ranges: #{gem_version_ranges}"
+        return ""
+      end
+
+      # base case: a specific version
+      if gem_version_ranges[0].size == 1
+        range = gem_version_ranges[0][0]
+        if range.left.version == range.right.version
+          return range.left.version.to_s
+        end
+      end
+
+      gem_version_ranges[0] = Bundler::VersionRanges::ReqR.reduce(gem_version_ranges[0])
+
+      arr = []
+      gem_version_ranges[0].each do |reqr|
+        range_begin = reqr.left.inclusive ? "[" : "("
+        range_end = reqr.right.inclusive ? "]" : ")"
+        arr << "#{range_begin}#{reqr.left.version.to_s}, #{reqr.right.version.to_s}#{range_end}"
+      end
+      gem_version_ranges[1].each do |neq|
+        # special case: exclude specific version
+        arr << "!= #{neq.version.to_s}"
+      end
+      arr.join(", ")
     end
   end
 end
