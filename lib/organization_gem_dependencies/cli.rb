@@ -37,18 +37,17 @@ module OrganizationGemDependencies
         STDERR.puts "Processing #{gemfile_path}"
         content = nil
         sleep_time = 0
-        while content.nil?
-          begin
-            content = Base64.decode64(github.get(gemfile.url).content)
-          rescue StandardError
-            sleep_time += 1
-            STDERR.puts "Sleeping #{sleep_time} seconds"
-            sleep(sleep_time)
-          end
+        begin
+          content = Base64.decode64(github.get(gemfile.url).content)
+        rescue StandardError
+          sleep_time += 1
+          STDERR.puts "Sleeping #{sleep_time} seconds"
+          sleep(sleep_time)
+          retry
         end
         merge!(gems, process_gemfile(
-                       Bundler::LockfileParser.new(content),
-                       "#{gemfile.repository.name}/#{gemfile.path}"
+          Bundler::LockfileParser.new(content),
+          "#{gemfile.repository.name}/#{gemfile.path}"
         ))
       end
       output gems
@@ -67,7 +66,15 @@ module OrganizationGemDependencies
         repositories << repository.name if repository.archived
       end
       until last_response.rels[:next].nil?
-        last_response = last_response.rels[:next].get
+        sleep_time = 0
+        begin
+          last_response = last_response.rels[:next].get
+        rescue StandardError
+          sleep_time += 1
+          STDERR.puts "Sleeping #{sleep_time} seconds"
+          sleep(sleep_time)
+          retry
+        end
         last_response.data.each do |repository|
           repositories << repository.name if repository.archived
         end
@@ -102,7 +109,15 @@ module OrganizationGemDependencies
         matches << match unless archived.include? match.repository.name
       end
       until last_response.rels[:next].nil?
-        last_response = last_response.rels[:next].get
+        sleep_time = 0
+        begin
+          last_response = last_response.rels[:next].get
+        rescue StandardError
+          sleep_time += 1
+          STDERR.puts "Sleeping #{sleep_time} seconds"
+          sleep(sleep_time)
+          retry
+        end
         last_response.data.items.each do |match|
           matches << match unless archived.include? match.repository.name
         end
