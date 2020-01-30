@@ -160,16 +160,20 @@ module OrganizationGemDependencies
       @options = { direct: false, ignore_paths: [] }
       OptionParser.new do |config|
         config.banner = USAGE
+        config.on('-h', '--help', 'Prints this help') do
+          puts config
+          exit
+        end
         config.on('-d', '--direct',
                   'Consider only direct dependencies.') do |direct|
           @options[:direct] = direct
         end
-        config.on('--ignore-file [FILEPATH]',
+        config.on('-i', '--ignore-file [FILEPATH]',
                   'Ignore projects included in file.') do |ignore_file|
 
           build_ignore_paths(@options[:ignore_paths], ignore_file)
         end
-        config.on('--gems [GEM1,GEM2,GEM3]',
+        config.on('-g', '--gems [GEM1,GEM2,GEM3]',
                   'Consider only given gems.') do |gems|
 
           @options[:gems] = gems.split(',')
