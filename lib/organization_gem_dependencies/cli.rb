@@ -186,10 +186,6 @@ module OrganizationGemDependencies
       @options = { direct: false, ignore_paths: [] }
       OptionParser.new do |config|
         config.banner = USAGE
-        config.on('-h', '--help', 'Prints this help') do
-          puts config
-          exit
-        end
         config.on('-d', '--direct',
                   'Consider only direct dependencies.') do |direct|
           @options[:direct] = direct
