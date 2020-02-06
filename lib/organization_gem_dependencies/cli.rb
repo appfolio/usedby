@@ -12,12 +12,11 @@ module OrganizationGemDependencies
   class Cli
     using VersionRangesIntersection
 
-    SEARCH_TERM = 'org:%s filename:Gemfile.lock'
+    GEMFILE_LOCK_SEARCH_TERM = 'org:%s filename:Gemfile.lock'
+    GEMSPEC_SEARCH_TERM = 'org:%s extension:gemspec'
     USAGE = <<~USAGE
       Usage: organization_gem_dependencies [options] GITHUB_ORGANIZATION
     USAGE
-
-    GEMSPEC_SEARCH_TERM = 'org:%s extension:gemspec'
 
     def run
       parse_options
@@ -125,7 +124,7 @@ module OrganizationGemDependencies
       false
     end
 
-    def gemfiles(github, organization, search_term = SEARCH_TERM)
+    def gemfiles(github, organization, search_term = GEMFILE_LOCK_SEARCH_TERM)
       archived = archived_repositories(github, organization)
       github.search_code(search_term % organization, per_page: 1000)
       last_response = github.last_response
