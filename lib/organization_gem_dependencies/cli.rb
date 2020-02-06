@@ -3,9 +3,9 @@
 require 'base64'
 require 'io/console'
 require 'json'
-require 'optparse'
-
 require 'octokit'
+require 'optparse'
+require 'organization_gem_dependencies/version_ranges_intersection'
 
 module OrganizationGemDependencies
   # Define the command line interface.
