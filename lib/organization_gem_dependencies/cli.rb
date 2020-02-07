@@ -18,6 +18,7 @@ module OrganizationGemDependencies
       Usage: organization_gem_dependencies [options] GITHUB_ORGANIZATION
     USAGE
 
+
     def run
       parse_options
       if ARGV.size != 1
@@ -31,48 +32,15 @@ module OrganizationGemDependencies
       github = Octokit::Client.new(access_token: access_token)
 
       gems = {}
-      gemfiles(github, github_organization) do |gemfile|
-        gemfile_path = "#{gemfile.repository.name}/#{gemfile.path}"
-        if filtered?(gemfile_path)
-          STDERR.puts "Skipping #{gemfile_path}"
-          next
-        end
-        STDERR.puts "Processing #{gemfile_path}"
-        sleep_time = 0
-        begin
-          content = Base64.decode64(github.get(gemfile.url).content)
-        rescue StandardError
-          sleep_time += 1
-          STDERR.puts "Sleeping #{sleep_time} seconds"
-          sleep(sleep_time)
-          retry
-        end
-        merge!(gems, process_gemfile(
-          Bundler::LockfileParser.new(content),
-          "#{gemfile.repository.name}/#{gemfile.path}"
-        ))
+
+      remote_search(github, github_organization, GEMFILE_LOCK_SEARCH_TERM) do |gemfile_lock|
+        content = Bundler::LockfileParser.new(remote_file(github, gemfile_lock))
+        merge!(gems, process_gemfile(content, "#{gemfile_lock.repository.name}/#{gemfile_lock.path}"))
       end
 
-      gemfiles(github, github_organization, GEMSPEC_SEARCH_TERM) do |gemspec|
-        gemspec_path = "#{gemspec.repository.name}/#{gemspec.path}"
-        if filtered?(gemspec_path)
-          STDERR.puts "Skipping #{gemspec_path}"
-          next
-        end
-        STDERR.puts "Processing #{gemspec_path}"
-        content = nil
-        sleep_time = 0
-        begin
-          content = Base64.decode64(github.get(gemspec.url).content)
-        rescue StandardError
-          sleep_time += 1
-          STDERR.puts "Sleeping #{sleep_time} seconds"
-          sleep(sleep_time)
-          retry
-        end
-        merge!(gems, process_gemspec(content,
-                                     "#{gemspec.repository.name}/#{gemspec.path}"
-        ))
+      remote_search(github, github_organization, GEMSPEC_SEARCH_TERM) do |gemspec|
+        content = remote_file(github, gemspec)
+        merge!(gems, process_gemspec(content, "#{gemspec.repository.name}/#{gemspec.path}"))
       end
 
       output gems
@@ -124,7 +92,7 @@ module OrganizationGemDependencies
       false
     end
 
-    def gemfiles(github, organization, search_term = GEMFILE_LOCK_SEARCH_TERM)
+    def remote_search(github, organization, search_term)
       archived = archived_repositories(github, organization)
       github.search_code(search_term % organization, per_page: 1000)
       last_response = github.last_response
@@ -151,6 +119,25 @@ module OrganizationGemDependencies
       matches.sort_by(&:html_url).each do |match|
         yield match
       end
+    end
+
+    def remote_file(github, file)
+      github_path = "#{file.repository.name}/#{file.path}"
+      if filtered?(github_path)
+        STDERR.puts "Skipping #{github_path}"
+        return
+      end
+      STDERR.puts "Processing #{github_path}"
+      sleep_time = 0
+      begin
+        content = Base64.decode64(github.get(file.url).content)
+      rescue StandardError
+        sleep_time += 1
+        STDERR.puts "Sleeping #{sleep_time} seconds"
+        sleep(sleep_time)
+        retry
+      end
+      content
     end
 
     def merge!(base, additions)
