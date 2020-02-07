@@ -4,42 +4,29 @@ module VersionRangesIntersection
   refine Bundler::VersionRanges::ReqR do
     # Checks whether two ranges overlap
     def intersect?(other)
-      a = self
-      b = other
-
-      case a <=> b
-      when 0
-        return true
+      case self <=> other
+      when -1
+        return (right <=> other.left) == 1
       when 1
-        b = self
-        a = other
+        return (other.right <=> left) == 1
       end
 
-      # invariant: a.left < b.left
-
-      case a.right <=> b.left
-      when 1
-        return true
-      end
-
-      false
+      true
     end
 
     # Returns a new range which is the intersection, or else nil
     def intersection(other)
       return nil unless intersect?(other)
 
-      a = clone
-      b = other
-
-      case a <=> b
+      inter = clone
+      case inter <=> other
       when -1
-        a.left = b.left
+        inter.left = other.left
       when 1
-        a.right = b.right
+        inter.right = other.right
       end
 
-      a
+      inter
     end
   end
 
