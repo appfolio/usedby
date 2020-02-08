@@ -3,8 +3,10 @@
 require 'base64'
 require 'io/console'
 require 'json'
-require 'octokit'
 require 'optparse'
+
+require 'octokit'
+
 require 'organization_gem_dependencies/version_ranges_intersection'
 
 module OrganizationGemDependencies
