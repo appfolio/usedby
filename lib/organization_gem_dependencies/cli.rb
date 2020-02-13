@@ -36,12 +36,15 @@ module OrganizationGemDependencies
       gems = {}
 
       remote_search(github, github_organization, GEMFILE_LOCK_SEARCH_TERM) do |gemfile_lock|
-        content = Bundler::LockfileParser.new(remote_file(github, gemfile_lock))
+        content = remote_file(github, gemfile_lock)
+        next unless content
+        content = Bundler::LockfileParser.new(content)
         merge!(gems, process_gemfile(content, "#{gemfile_lock.repository.name}/#{gemfile_lock.path}"))
       end
 
       remote_search(github, github_organization, GEMSPEC_SEARCH_TERM) do |gemspec|
         content = remote_file(github, gemspec)
+        next unless content
         merge!(gems, process_gemspec(content, "#{gemspec.repository.name}/#{gemspec.path}"))
       end
 
