@@ -1,25 +1,25 @@
-# organization_gem_dependencies
+# usedby
 
 Figure out where your gems are actually being used!
 
-This gem installs a command line utility `organization_gem_dependencies`, that
+This gem installs a command line utility `usedby`, that
 outputs a json file with a reverse dependency tree.
 
 ## Installation
 
 ```sh
-gem install organization_gem_dependencies
+gem install usedby
 ```
 
 ## Usage
 
 ```sh
-organization_gem_dependencies GITHUB_ORGANIZATION [--direct] [--gems GEM1,GEM2,GEM3]
+usedby GITHUB_ORGANIZATION [--direct] [--gems GEM1,GEM2,GEM3]
 ```
 
 You will be securely prompted for a [GitHub Personal Access Token](https://github.com/settings/tokens).
 
-For example, running `organization_gem_dependencies rails --direct --gems railties,rake` produces output
+For example, running `usedby rails --direct --gems railties,rake` produces output
 like the following:
 
 ```json

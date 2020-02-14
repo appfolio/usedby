@@ -15,4 +15,4 @@ rescue Bundler::BundlerError => e
 end
 
 require 'minitest/autorun'
-require 'organization_gem_dependencies'
+require 'usedby'

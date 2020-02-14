@@ -1,20 +1,20 @@
 # frozen_string_literal: true
 
-require_relative 'lib/organization_gem_dependencies/version'
+require_relative 'lib/usedby/version'
 
 Gem::Specification.new do |s|
   s.author = 'Bryce Boe'
   s.description = <<~DESCRIPTION
-    organization_gem_dependencies is a command line tool to allow one to
+    usedby is a command line tool to allow one to
     discover ruby gem dependencies for all ruby projects across a github
     organization..
   DESCRIPTION
   s.email = 'bryce.boe@appfolio.com'
-  s.executables = %(organization_gem_dependencies)
+  s.executables = %(usedby)
   s.files = Dir.glob('{bin,lib}/**/*') + %w[CHANGES.md LICENSE.txt README.md]
-  s.homepage = 'https://github.com/appfolio/organization_gem_dependencies'
+  s.homepage = 'https://github.com/appfolio/usedby'
   s.license = 'BSD-2-Clause'
-  s.name = 'organization_gem_dependencies'
+  s.name = 'usedby'
   s.summary = 'Discover all ruby gem dependencies for a github organization.'
   s.version = OrganizationGemDependencies::VERSION
 
