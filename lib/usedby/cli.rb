@@ -7,9 +7,9 @@ require 'optparse'
 
 require 'octokit'
 
-require 'organization_gem_dependencies/version_ranges_intersection'
+require 'usedby/version_ranges_intersection'
 
-module OrganizationGemDependencies
+module Usedby
   # Define the command line interface.
   class Cli
     using VersionRangesIntersection
@@ -17,7 +17,7 @@ module OrganizationGemDependencies
     GEMFILE_LOCK_SEARCH_TERM = 'org:%s filename:Gemfile.lock'
     GEMSPEC_SEARCH_TERM = 'org:%s extension:gemspec'
     USAGE = <<~USAGE
-      Usage: organization_gem_dependencies [options] GITHUB_ORGANIZATION
+      Usage: usedby [options] GITHUB_ORGANIZATION
     USAGE
 
 
@@ -191,7 +191,7 @@ module OrganizationGemDependencies
 
           @options[:gems] = gems.split(',')
         end
-        config.version = OrganizationGemDependencies::VERSION
+        config.version = Usedby::VERSION
       end.parse!
     end
 
