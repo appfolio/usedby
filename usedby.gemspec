@@ -3,19 +3,17 @@
 require_relative 'lib/usedby/version'
 
 Gem::Specification.new do |s|
-  s.author = 'Bryce Boe'
+  s.author = 'AppFolio, Inc.'
   s.description = <<~DESCRIPTION
-    usedby is a command line tool to allow one to
-    discover ruby gem dependencies for all ruby projects across a github
-    organization..
+    usedby is a command line tool to discover all dependents of ruby gems across a github organization.
   DESCRIPTION
-  s.email = 'bryce.boe@appfolio.com'
+  s.email = 'opensource@appfolio.com'
   s.executables = %(usedby)
   s.files = Dir.glob('{bin,lib}/**/*') + %w[CHANGES.md LICENSE.txt README.md]
   s.homepage = 'https://github.com/appfolio/usedby'
   s.license = 'BSD-2-Clause'
   s.name = 'usedby'
-  s.summary = 'Discover all ruby gem dependencies for a github organization.'
+  s.summary = 'Discover all dependents of ruby gems across a github organization.'
   s.version = Usedby::VERSION
 
   s.add_development_dependency 'minitest', '~> 5.0'
