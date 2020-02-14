@@ -1,3 +1,4 @@
 *.gem
-ignore_list.txt
+Gemfile.lock
 coverage/
+ignore_list.txt
