@@ -1,9 +1,14 @@
 # usedby
 
 Figure out where your gems are actually being used!
+Similar to GitHub's "Used By" feature, but for private repos.
 
 This gem installs a command line utility `usedby`, that
 outputs a json file with a reverse dependency tree.
+
+This acts more or less like GitHub's "Used By" feature.
+It currently uses GitHub's code search API which has a few limitations:
+https://help.github.com/en/github/searching-for-information-on-github/searching-code
 
 ## Installation
 
