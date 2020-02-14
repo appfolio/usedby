@@ -2,4 +2,4 @@
 # frozen_string_literal: true
 
 require 'usedby'
-exit OrganizationGemDependencies::Cli.new.run
+exit Usedby::Cli.new.run

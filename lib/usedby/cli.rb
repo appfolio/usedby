@@ -9,7 +9,7 @@ require 'octokit'
 
 require 'usedby/version_ranges_intersection'
 
-module OrganizationGemDependencies
+module Usedby
   # Define the command line interface.
   class Cli
     using VersionRangesIntersection
@@ -191,7 +191,7 @@ module OrganizationGemDependencies
 
           @options[:gems] = gems.split(',')
         end
-        config.version = OrganizationGemDependencies::VERSION
+        config.version = Usedby::VERSION
       end.parse!
     end
 

@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.license = 'BSD-2-Clause'
   s.name = 'usedby'
   s.summary = 'Discover all ruby gem dependencies for a github organization.'
-  s.version = OrganizationGemDependencies::VERSION
+  s.version = Usedby::VERSION
 
   s.add_development_dependency 'minitest', '~> 5.0'
   s.add_development_dependency 'rake', '~> 12.0'
