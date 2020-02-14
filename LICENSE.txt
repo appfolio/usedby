@@ -1,5 +1,4 @@
-Copyright (c) 2018, AppFolio, Inc.
-Copyright (c) 2018, Bryce Boe
+Copyright (c) 2020, AppFolio, Inc.
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
