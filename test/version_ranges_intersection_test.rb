@@ -137,5 +137,5 @@ class VersionRangesIntersectionTest < MiniTest::Test
     assert_equal Bundler::VersionRanges::ReqR, reduced_reqrs[0].class
     assert_equal 2, reduced_reqrs.size
     assert_equal ranges[0], reduced_reqrs
-    end
+  end
 end
