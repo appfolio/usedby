@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   DESCRIPTION
   s.email = 'opensource@appfolio.com'
   s.executables = %(usedby)
-  s.files = Dir.glob('{bin,lib}/**/*') + %w[CHANGES.md LICENSE.txt README.md]
+  s.files = Dir.glob('{bin,lib}/**/*') + %w[CHANGELOG.md LICENSE.txt README.md]
   s.homepage = 'https://github.com/appfolio/usedby'
   s.license = 'BSD-2-Clause'
   s.name = 'usedby'
