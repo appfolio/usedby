@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bundler/version_ranges'
+
 module VersionRangesIntersection
   refine Bundler::VersionRanges::ReqR do
     # Checks whether two ranges overlap
