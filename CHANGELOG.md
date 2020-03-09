@@ -1,8 +1,16 @@
 # Changelog
 
-## [0.4.0](https://github.com/appfolio/usedby/tree/0.4.0) (2020-02-14)
+## [0.4.1](https://github.com/appfolio/usedby/tree/0.4.1) (2020-03-09)
 
-[Full Changelog](https://github.com/appfolio/usedby/compare/v0.3.0...0.4.0)
+[Full Changelog](https://github.com/appfolio/usedby/compare/v0.4.1.pre.1...0.4.1)
+
+**Merged pull requests:**
+
+- Fix gemfile not found error [\#19](https://github.com/appfolio/usedby/pull/19) ([magneland](https://github.com/magneland))
+
+## [v0.4.1.pre.1](https://github.com/appfolio/usedby/tree/v0.4.1.pre.1) (2020-03-06)
+
+[Full Changelog](https://github.com/appfolio/usedby/compare/v0.3.0...v0.4.1.pre.1)
 
 **Closed issues:**
 
@@ -11,6 +19,8 @@
 
 **Merged pull requests:**
 
+- Cosmetic fixes [\#18](https://github.com/appfolio/usedby/pull/18) ([magneland](https://github.com/magneland))
+- Prepare for publish [\#14](https://github.com/appfolio/usedby/pull/14) ([magneland](https://github.com/magneland))
 - Rename gem [\#13](https://github.com/appfolio/usedby/pull/13) ([magneland](https://github.com/magneland))
 - Check for skipped file before processing content [\#12](https://github.com/appfolio/usedby/pull/12) ([magneland](https://github.com/magneland))
 - Add gemspecs [\#11](https://github.com/appfolio/usedby/pull/11) ([magneland](https://github.com/magneland))
