@@ -5,6 +5,7 @@ require 'io/console'
 require 'json'
 require 'optparse'
 
+require 'bundler'
 require 'octokit'
 
 require 'usedby/version_ranges_intersection'
