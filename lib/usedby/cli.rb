@@ -21,7 +21,6 @@ module Usedby
       Usage: usedby [options] GITHUB_ORGANIZATION
     USAGE
 
-
     def run
       parse_options
       if ARGV.size != 1
@@ -49,7 +48,12 @@ module Usedby
         merge!(gems, process_gemspec(content, "#{gemspec.repository.name}/#{gemspec.path}"))
       end
 
-      output gems
+      case @options[:order]
+      when 'projects'
+        output_projects gems
+      else
+        output_gems gems
+      end
 
       0
     end
@@ -163,7 +167,7 @@ module Usedby
       end
     end
 
-    def output(gems)
+    def output_gems(gems)
       sorted_gems = {}
       gems.sort.each do |gem, versions|
         sorted_gems[gem] = {}
@@ -172,6 +176,19 @@ module Usedby
         end
       end
       puts JSON.pretty_generate(sorted_gems)
+    end
+
+    def output_projects(gems)
+      sorted_projects = {}
+      gems.sort.each do |gem, versions|
+        versions.sort.each do |version, projects|
+          projects.sort.each do |project|
+            sorted_projects[project] ||= {}
+            sorted_projects[project][gem] = version_ranges_to_s(version)
+          end
+        end
+      end
+      puts JSON.pretty_generate(sorted_projects.sort.to_h)
     end
 
     def parse_options
@@ -184,13 +201,15 @@ module Usedby
         end
         config.on('-i', '--ignore-file [FILEPATH]',
                   'Ignore projects included in file.') do |ignore_file|
-
           build_ignore_paths(@options[:ignore_paths], ignore_file)
         end
         config.on('-g', '--gems [GEM1,GEM2,GEM3]',
                   'Consider only given gems.') do |gems|
-
           @options[:gems] = gems.split(',')
+        end
+        config.on('-o', '--order gems|projects',
+                  'Order by gems or projects.') do |order|
+          @options[:order] = order
         end
         config.version = Usedby::VERSION
       end.parse!
